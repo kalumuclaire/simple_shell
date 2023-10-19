@@ -1,0 +1,301 @@
+.TH SIMPLE_SHELL 1  "Holberton School" "Linux Programmers Manual"
+.SH NAME
+Simple Shell is an interpreter for command languages that reads data from standard input.
+.SH SYNOPSIS
+
+simple_shell receives user-supplied commands and tries to run them through low-level system processes.
+
+Most of the faults and warnings can be ignored during compilation. Regarding the GCC, they are:
+
+.B gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
+
+The user has to use the command and have executable rights in order to launch the shell.
+
+.B ./hsh
+
+(or, should it change, the executable's name)
+
+.SH DESCRIPTION
+
+The straightforward shell program uses the Standard Input stream to receive commands from the user. It then looks for built-in functions in the shell or executables that are defined in the environmental variable PATH and exist in the operating system to try and carry out the commands.
+An exit error number is set and a message is generated on the Standard Error stream when an error occurs, such as when a command cannot be located or is executed with invalid options.
+.TP
+\fB Return (Exit Value) \fR
+
+The status of the most recent command run will determine the exit value that is set when the simple shell program terminates. The command's exit value will be zero (0) if it executed successfully.
+
+The values that can be set in the event that an error occurs are:
+
+1- General mistake catch-all
+
+2-Abuse of built-in shell features
+
+126 - The invoked command is unable to run
+
+127: No such command
+
+130 - Control-C ends the script
+
+.TP
+\fBFORMAT OF COMMAND INPUT\fR
+
+There are two modes of operation for the basic shell: \fIinteractive\fR and \fInon-interactive\fR. Both ways allow commands to be written with either their full path or, if they are found in one of the PATH-defined folders, just their executable name.
+Example:
+
+\fB/bin/ls\fR is the same as \fBls\fR (ls exists in one of the PATH folders)
+
+
+.IP \fB-Interactive Mode:\fR
+
+When this happens, the shell will provide a prompt ($) to let the user know that they can type commands using a keyboard. The user must hit the enter key (new line) to carry out the commands.
+The prompt will come back up and wait for fresh input from the user each time a command is run.
+Example:
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR ./hsh
+
+$ ls
+
+file1 file2 dira dirb
+
+$
+
+The CTRL + C signal is solely used for internal script termination; it does not terminate the simple shell. To exit the shell, the user must hit CTRL + D.
+.IP \fB-Non-interactive Mode:\fR
+
+In this scenario, the shell won't show a prompt($) or wait for more user input; instead, it will execute instructions that are sent across a pipe at that same moment:
+Example:
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR echo "ls" | ./hsh
+
+file1 file2 dira dirb
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR
+
+
+.TP
+\fBArguments\fR
+
+When executing a program, most commands offer a number of choices or arguments that can be selected. The user needs to sever everything with spaces so that the Shell can identify those parameters.
+Example:
+
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR ./hsh
+
+$ ls -l /tmp
+
+total 0
+
+$
+
+or
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR echo "ls -l /tmp" | ./hsh
+
+total 0
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR
+
+.TP
+\fBComments\fR
+A comment is an additional argument that can be used when running commands. When executing, this option is utilized to write a descriptive text. The user must add the character "#" with a trailing space after a command or its arguments in order to use this option:
+
+Example:
+
+\fBtest@ubuntu:~/simple_shell$\fR ./hsh
+
+$ ls -l /tmp \fB#This is a Comment\fR
+
+total 0
+
+$
+
+All text entered following the '#' symbol will be discarded during execution.
+
+.TP
+\fBBuiltins\fR
+
+.RS
+Certain commands in the simple shell operate internally when they are executed and don't rely on outside applications.
+.IP \fBexit\fR
+
+There are two variants available for this command, which is used to end the shell:
+
+$ exit
+
+or
+
+$ exit status (Where status is an integer number)
+
+The shell will exit with the value of the most recent error detected, or zero (0) if none at all, if no status is given.
+
+.IP \fBenv\fR
+
+(Environment) This command shows the current environment of the system using the variable=value format.
+
+Its application is quite easy:
+
+$ env
+
+with no options.
+
+.IP \fBsetenv\fR
+
+If an environmental variable already exists, this command will overwrite its value; if not, it will create a new one. The following is its syntax:
+
+$ setenv VARIABLE VALUE
+
+The character '=' cannot be present in the VARIABLE parameter; else, an error message will appear.
+
+In the event that the command is used in the form:
+
+$ setenv
+
+The current environment will be printed as if \fBenv\fR had been used.
+
+.IP \fBunsetenv\fR
+
+If an environmental variable is present in the system, this command will remove it; if not, the environment will remain unaltered. This is how it is syntaxed.
+
+$ unsetenv VARIABLE
+
+The character '=' cannot be present in the VARIABLE parameter; else, an error message will appear.
+
+Without any parameters, unsetenv will just leave the surroundings unaltered.
+
+.IP \fBcd\fR
+
+(Change Directory) This command is used for changing the current working directory with the syntax:
+
+$ cd DIRECTORY
+
+If cd is used without directory in the form
+
+$ cd
+
+The value of the environmental variable HOME will be used by the command to change the directory.
+
+When utilized with the '-' option but without a directory
+
+$ cd -
+
+The prior working directory will be the one that the command changes to. The preceding dir is initially set to HOME by default.
+
+Note: The working directory is reflected in the environmental variable PWD each time cd is used.
+
+.IP \fBhelp\fR
+
+A paragraph describing how to use a built-in will be displayed using this command. This is how it is syntaxed:
+$ help BUILTIN
+
+
+A list of the built-in commands that are available along with their usage syntax will be displayed if no argument is provided. An error will appear if a built-in that doesn't exist is provided.
+
+Note: You can use the help command on its own as well.
+
+$ help help
+
+
+.RE
+.TP
+\fBSearch and Execution\fR
+
+The search and execution sequence in the simple shell is constant.
+
+Upon receiving a written command, the Shell first determines if it is a built-in command. The prompt will reappear and the command will be executed internally if the condition is satisfied.
+
+
+A built-in command's absence results in one of two outcomes:
+
+\fB1.\fR When a command name ends in a slash, it is just performed without doing any searches.
+\fB2.\fR The command is found by the shell going through every entry in the environmental variable PATH.  A list of entries divided by colons should represent the value of the PATH variable.  The directory name appears in every entry.
+A single period can be used to explicitly identify the current directory, or an empty directory name can do so implicitly.
+
+If the command's executable is located in the PATH, it is executed in a child process, which is a subprocess that keeps the Shell from quitting when the command terminates.
+
+The Shell will show an error indicating the problem if the command cannot be found. Additionally, the command count will be tracked by the Shell and shown when the problem occurs.
+
+
+.SH GENERAL USE EXAMPLES
+
+.RE
+
+
+.IP \fBInteractive Mode\fR
+
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR ./hsh
+
+$ ls
+
+file1 file2 dira dirb
+
+$ ls -l
+
+-rw-rw-r-- 1 vagrant vagrant  1293 Nov 25 02:01 file1
+
+-rw-rw-r-- 1 vagrant vagrant  4768 Nov 23 23:01 file2
+
+drwxrwxr-x 2 vagrant vagrant  4096 Nov 21 14:48 dira
+
+drwxrwxr-x 2 vagrant vagrant  4126 Nov 21 11:21 dirb
+
+$ echo Hello
+
+Hello
+
+$ qwerty
+
+\ ./hsh: 4: qwerty: not found
+
+$ env
+
+USER=vagrant
+
+LANGUAGE=en_US
+
+SESSION=ubuntu
+
+COMPIZ_CONFIG_PROFILE=ubuntu
+
+SHLVL=1
+
+HOME=/home/vagrant
+
+DESKTOP_SESSION=ubuntu
+
+LOGNAME=vagrant
+
+TERM=xterm-256color
+
+PATH=/home/vagrant/bin:/home/vagrant/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin
+
+DISPLAY=:0
+
+$ exit
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR
+
+.IP \fBNon-interactive Mode\fR
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR echo "ls" | ./hsh
+
+file1 file2 dira dirb
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR echo "ls -l" | ./hsh
+
+-rw-rw-r-- 1 vagrant vagrant  1293 Nov 25 02:01 file1
+
+-rw-rw-r-- 1 vagrant vagrant  4768 Nov 23 23:01 file2
+
+drwxrwxr-x 2 vagrant vagrant  4096 Nov 21 14:48 dira
+
+drwxrwxr-x 2 vagrant vagrant  4126 Nov 21 11:21 dirb
+
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR echo "qwerty" | ./hsh
+
+\ ./hsh: 1: qwerty: not found
+
+\fBvagrant@vagrant-ubuntu-trusty-64:~/simple_shell$\fR
+
+.SH BUGS
